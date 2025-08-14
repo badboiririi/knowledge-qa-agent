@@ -38,12 +38,18 @@
       <div class="modal-content">
         <button class="close-modal" @click="closeModal">&times;</button>
         <div class="image-container">
-          <h3 class="image-title">安东-安东石油QHSE（安全生产）管理规定(ZD-ZH-016V0-2021</h3>
+          <h3 class="image-title">{{ leftTitle }}</h3>
           <div id="anton-docx-container" style="width: 100%; height: 80vh; overflow-y: auto;"></div>
         </div>
         <div class="image-container">
-          <h3 class="image-title">斯伦贝谢-HSE_to_Go_Handbook</h3>
+          <h3 class="image-title">{{ rightTitle }}</h3>
           <div id="schlumberger-docx-container" style="width: 100%; height: 80vh; overflow-y: auto;"></div>
+        </div>
+        <div class="nav-toolbar">
+          <button class="nav-btn" :class="{ disabled: !hasPrevPair }" title="切换上一组文件" @click="goPrevPair" aria-label="上一组">◀</button>
+          <button class="nav-btn" :class="{ disabled: !hasPrevDiff }" title="上一处差异" @click="goPrevDiff" aria-label="上一处">▲</button>
+          <button class="nav-btn" :class="{ disabled: !hasNextDiff }" title="下一处差异" @click="goNextDiff" aria-label="下一处">▼</button>
+          <button class="nav-btn" :class="{ disabled: !hasNextPair }" title="切换下一组文件" @click="goNextPair" aria-label="下一组">▶</button>
         </div>
       </div>
     </div>
@@ -51,8 +57,8 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
-import docx from 'docx-preview';
+import { ref, onMounted, computed } from 'vue';
+import * as docx from 'docx-preview';
 
 export default {
   name: 'CompareAssistant',
@@ -61,6 +67,34 @@ export default {
     const chatInput = ref(null);
     const modal = ref(null);
     const userInput = ref('');
+
+    // 文件组合与差异位置（演示用两个组合，路径先沿用一组）
+    const filePairs = ref([
+      {
+        leftTitle: '安东-安东石油QHSE（安全生产）管理规定(ZD-ZH-016V0-2021)',
+        leftUrl: 'https://static-host-vsu1427n-test.sealoshzh.site/document/anton.docx',
+        rightTitle: '斯伦贝谢-HSE_to_Go_Handbook',
+        rightUrl: 'https://static-host-vsu1427n-test.sealoshzh.site/document/斯伦贝谢.docx',
+        diffs: [ { left: 2, right: 5 }, { left: 6, right: 10 } ]
+      },
+      {
+        leftTitle: '安东-安东石油QHSE（安全生产）管理规定(ZD-ZH-016V0-2021)',
+        leftUrl: 'https://static-host-vsu1427n-test.sealoshzh.site/document/anton.docx',
+        rightTitle: '斯伦贝谢-HSE_to_Go_Handbook',
+        rightUrl: 'https://static-host-vsu1427n-test.sealoshzh.site/document/斯伦贝谢.docx',
+        diffs: [ { left: 2, right: 5 }, { left: 6, right: 10 } ]
+      }
+    ]);
+    const currentPairIndex = ref(0);
+    const currentDiffIndex = ref(0);
+
+    const currentPair = computed(() => filePairs.value[currentPairIndex.value]);
+    const leftTitle = computed(() => currentPair.value?.leftTitle || '左侧文档');
+    const rightTitle = computed(() => currentPair.value?.rightTitle || '右侧文档');
+    const hasPrevPair = computed(() => currentPairIndex.value > 0);
+    const hasNextPair = computed(() => currentPairIndex.value < filePairs.value.length - 1);
+    const hasPrevDiff = computed(() => currentDiffIndex.value > 0);
+    const hasNextDiff = computed(() => currentPair.value && currentDiffIndex.value < (currentPair.value.diffs?.length || 0) - 1);
 
     const scrollToBottom = () => {
       if (chatBody.value) chatBody.value.scrollTop = chatBody.value.scrollHeight;
@@ -168,6 +202,9 @@ export default {
 
     const showSourceModal = () => {
       if (!modal.value) return;
+      // 打开即默认第一个组合第一处差异
+      currentPairIndex.value = 0;
+      currentDiffIndex.value = 0;
       modal.value.style.display = 'flex';
       renderWordDocuments();
     };
@@ -222,27 +259,69 @@ export default {
       setTimeout(() => { if (!disconnected) { observer.disconnect(); disconnected = true; } clearTimeout(t1); clearTimeout(t2); }, timeoutMs);
     };
 
+    const clearContainers = () => {
+      const left = document.getElementById('anton-docx-container');
+      const right = document.getElementById('schlumberger-docx-container');
+      if (left) left.innerHTML = '';
+      if (right) right.innerHTML = '';
+    };
+
+    const scrollToCurrentDiff = () => {
+      const pair = currentPair.value;
+      if (!pair || !pair.diffs || pair.diffs.length === 0) return;
+      const diff = pair.diffs[currentDiffIndex.value] || pair.diffs[0];
+      ensureScrollToPage('anton-docx-container', diff.left);
+      ensureScrollToPage('schlumberger-docx-container', diff.right);
+    };
+
     const renderWordDocuments = async () => {
       try {
-        const antonResp = await fetch('https://static-host-vsu1427n-test.sealoshzh.site/document/anton.docx');
+        clearContainers();
+        const pair = currentPair.value;
+        const antonResp = await fetch(pair.leftUrl);
         const antonBuffer = await antonResp.arrayBuffer();
         const antonContainer = document.getElementById('anton-docx-container');
         await docx.renderAsync(antonBuffer, antonContainer, null, { inWrapper: true, ignoreWidth: false, ignoreHeight: false });
-        setTimeout(() => { ensureScrollToPage('anton-docx-container', 2); }, 120);
+        setTimeout(() => { scrollToCurrentDiff(); }, 120);
       } catch (e) {
         console.error('加载安东石油文档失败:', e);
         document.getElementById('anton-docx-container').innerHTML = '<p>文档加载失败，请检查文件路径或网络连接。</p>';
       }
       try {
-        const schResp = await fetch('https://static-host-vsu1427n-test.sealoshzh.site/document/斯伦贝谢.docx');
+        const pair = currentPair.value;
+        const schResp = await fetch(pair.rightUrl);
         const schBuffer = await schResp.arrayBuffer();
         const schContainer = document.getElementById('schlumberger-docx-container');
         await docx.renderAsync(schBuffer, schContainer, null, { inWrapper: true, ignoreWidth: false, ignoreHeight: false });
-        setTimeout(() => { ensureScrollToPage('schlumberger-docx-container', 5); }, 120);
+        setTimeout(() => { scrollToCurrentDiff(); }, 120);
       } catch (e) {
         console.error('加载斯伦贝谢文档失败:', e);
         document.getElementById('schlumberger-docx-container').innerHTML = '<p>文档加载失败，请检查文件路径或网络连接。</p>';
       }
+    };
+
+    // 导航行为
+    const goPrevDiff = () => {
+      if (!hasPrevDiff.value) return;
+      currentDiffIndex.value -= 1;
+      scrollToCurrentDiff();
+    };
+    const goNextDiff = () => {
+      if (!hasNextDiff.value) return;
+      currentDiffIndex.value += 1;
+      scrollToCurrentDiff();
+    };
+    const goPrevPair = () => {
+      if (!hasPrevPair.value) return;
+      currentPairIndex.value -= 1;
+      currentDiffIndex.value = 0;
+      renderWordDocuments();
+    };
+    const goNextPair = () => {
+      if (!hasNextPair.value) return;
+      currentPairIndex.value += 1;
+      currentDiffIndex.value = 0;
+      renderWordDocuments();
     };
 
     onMounted(() => {
@@ -257,10 +336,20 @@ export default {
       chatInput,
       modal,
       userInput,
+      leftTitle,
+      rightTitle,
       sendMessage,
       handleKeydown,
       selectQuestion,
-      closeModal
+      closeModal,
+      hasPrevPair,
+      hasNextPair,
+      hasPrevDiff,
+      hasNextDiff,
+      goPrevDiff,
+      goNextDiff,
+      goPrevPair,
+      goNextPair
     };
   }
 };
@@ -301,6 +390,12 @@ export default {
 .image-container:last-child { border-right: none; }
 .image-title { color: #1a1a1a; margin: 0 0 10px; font-size: 16px; text-align: center; }
 .docx-preview { width: 100% !important; max-width: 100%; height: auto; box-sizing: border-box; }
+
+/* 导航工具条样式 */
+.nav-toolbar { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; background: rgba(255,255,255,0.95); padding: 8px 10px; border-radius: 24px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); z-index: 1001; }
+.nav-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #e3e5e8; background: #ffffff; color: #3b3f45; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease; }
+.nav-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.12); background: #f7f9fc; }
+.nav-btn.disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; transform: none; }
 
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
