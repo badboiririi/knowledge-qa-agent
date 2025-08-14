@@ -46,9 +46,9 @@
           <div id="schlumberger-docx-container" style="width: 100%; height: 80vh; overflow-y: auto;"></div>
         </div>
         <div class="nav-toolbar">
-          <button class="nav-btn" :class="{ disabled: !hasPrevPair }" title="切换上一组文件" @click="goPrevPair" aria-label="上一组">◀</button>
           <button class="nav-btn" :class="{ disabled: !hasPrevDiff }" title="上一处差异" @click="goPrevDiff" aria-label="上一处">▲</button>
           <button class="nav-btn" :class="{ disabled: !hasNextDiff }" title="下一处差异" @click="goNextDiff" aria-label="下一处">▼</button>
+          <button class="nav-btn" :class="{ disabled: !hasPrevPair }" title="切换上一组文件" @click="goPrevPair" aria-label="上一组">◀</button>
           <button class="nav-btn" :class="{ disabled: !hasNextPair }" title="切换下一组文件" @click="goNextPair" aria-label="下一组">▶</button>
         </div>
       </div>
@@ -75,14 +75,14 @@ export default {
         leftUrl: 'https://static-host-vsu1427n-test.sealoshzh.site/document/anton.docx',
         rightTitle: '斯伦贝谢-HSE_to_Go_Handbook',
         rightUrl: 'https://static-host-vsu1427n-test.sealoshzh.site/document/斯伦贝谢.docx',
-        diffs: [ { left: 2, right: 5 }, { left: 6, right: 10 } ]
+        diffs: [ { left: 2, right: 5 }, { left: 3, right: 7 } ]
       },
       {
         leftTitle: '安东-安东石油QHSE（安全生产）管理规定(ZD-ZH-016V0-2021)',
         leftUrl: 'https://static-host-vsu1427n-test.sealoshzh.site/document/anton.docx',
         rightTitle: '斯伦贝谢-HSE_to_Go_Handbook',
         rightUrl: 'https://static-host-vsu1427n-test.sealoshzh.site/document/斯伦贝谢.docx',
-        diffs: [ { left: 2, right: 5 }, { left: 6, right: 10 } ]
+        diffs: [ { left: 2, right: 5 }, { left: 3, right: 7 } ]
       }
     ]);
     const currentPairIndex = ref(0);
@@ -278,7 +278,9 @@ export default {
       try {
         clearContainers();
         const pair = currentPair.value;
-        const antonResp = await fetch(pair.leftUrl);
+        const cacheToken = Date.now();
+        const leftUrl = pair.leftUrl + (pair.leftUrl.includes('?') ? '&' : '?') + 'v=' + cacheToken;
+        const antonResp = await fetch(leftUrl, { cache: 'no-store' });
         const antonBuffer = await antonResp.arrayBuffer();
         const antonContainer = document.getElementById('anton-docx-container');
         await docx.renderAsync(antonBuffer, antonContainer, null, { inWrapper: true, ignoreWidth: false, ignoreHeight: false });
@@ -289,7 +291,9 @@ export default {
       }
       try {
         const pair = currentPair.value;
-        const schResp = await fetch(pair.rightUrl);
+        const cacheToken = Date.now();
+        const rightUrl = pair.rightUrl + (pair.rightUrl.includes('?') ? '&' : '?') + 'v=' + cacheToken;
+        const schResp = await fetch(rightUrl, { cache: 'no-store' });
         const schBuffer = await schResp.arrayBuffer();
         const schContainer = document.getElementById('schlumberger-docx-container');
         await docx.renderAsync(schBuffer, schContainer, null, { inWrapper: true, ignoreWidth: false, ignoreHeight: false });
