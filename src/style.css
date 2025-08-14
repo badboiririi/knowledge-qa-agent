@@ -5,7 +5,6 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -24,10 +23,12 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  width: 100vw;
+  height: 100vh;
+  /* 使用白色避免在深色配色方案下出现全局黑底 */
+  background-color: #ffffff;
 }
 
 h1 {
@@ -59,10 +60,14 @@ button:focus-visible {
 }
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  /* 让应用容器占满全屏，避免左右留白（黑边） */
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  background-color: transparent;
+  overflow: hidden; /* 防止页面滚动 */
 }
 
 @media (prefers-color-scheme: light) {

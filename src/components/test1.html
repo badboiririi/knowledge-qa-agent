@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能助手</title>
+    <style>
+        /* --- 通用与字体设定 --- */
+        :root {
+            --primary-color: #4A89E8;
+            --primary-color-light: #e9f2ff;
+            --background-color: #f5f7fa;
+            --widget-bg-color: #ffffff;
+            --text-color-primary: #1a1a1a;
+            --text-color-secondary: #5f6368;
+            --border-color: #e0e4e8;
+            --bot-message-bg: #f8f9fb;
+            --user-message-bg: var(--primary-color-light);
+            --shadow-color: rgba(0, 0, 0, 0.08);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        /* --- 主聊天窗口 --- */
+        .chat-widget {
+            width: 450px;
+            height: 800px;
+            max-height: 95vh;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px var(--shadow-color);
+            background-color: var(--widget-bg-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        /* --- 标头 --- */
+        .chat-header {
+            padding: 16px 24px;
+            background-color: var(--widget-bg-color);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .header-title-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #6B73FF, #4F5BFF);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            color: white;
+            font-size: 20px;
+        }
+        .header-title h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color-primary);
+        }
+        .header-actions {
+            display: flex;
+            gap: 16px;
+        }
+        .header-actions svg {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            color: var(--text-color-secondary);
+            transition: color 0.2s, transform 0.2s;
+        }
+        .header-actions svg:hover {
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+        /* --- 聊天主体 --- */
+        .chat-body {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            gap: 0x;
+        }
+        .chat-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chat-body::-webkit-scrollbar-thumb {
+            background: #d0d4d8;
+            border-radius: 3px;
+        }
+        .chat-body::-webkit-scrollbar-thumb:hover {
+            background: #b0b4b8;
+        }
+        /* --- 猜你想问 & 后续问题通用样式 --- */
+        .question-list-container {
+            /* 减小内边距 */
+            padding: 8px; 
+            animation: fadeIn 0.5s ease;
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            box-shadow: 0 2px 6px var(--shadow-color);
+            /* 添加 margin 以缩小区域 */
+            margin: 0 16px; 
+        }
+        .question-list-title {
+            color: var(--text-color-secondary);
+            font-size: 13px;
+            margin-bottom: 8px;
+            text-align: center;
+            font-weight: 500;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .question-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px; /* 调整内边距 */
+            margin-bottom: 4px; /* 调整间距 */
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            font-size: 14px; /* 调整字体大小 */
+            color: var(--text-color-primary);
+            background-color: #f9fafc;
+            border: 1px solid transparent;
+        }
+        .question-item:last-child {
+            margin-bottom: 0;
+        }
+        .question-item:hover {
+            background-color: #f1f3f5;
+            transform: translateY(-1px);
+            border-color: var(--border-color);
+        }
+        .question-item-icon {
+            width: 6px; /* 减小图标大小 */
+            height: 6px;
+            background-color: #ffe5e7;
+            border: 1px solid #e57373;
+            border-radius: 50%;
+            margin-right: 10px; /* 调整间距 */
+            flex-shrink: 0;
+        }
+        .refresh-button {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 8px auto 0; /* 调整外边距 */
+            padding: 6px 12px; /* 调整内边距 */
+            background-color: #f5f6f8;
+            border: none;
+            border-radius: 16px;
+            color: var(--text-color-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s, transform 0.2s;
+        }
+        .refresh-button:hover {
+            background-color: #e8e9ec;
+            color: var(--text-color-primary);
+            transform: scale(1.05);
+        }
+        /* --- 后续问题特定样式 --- */
+        .follow-up-questions {
+            margin-top: 12px; /* 调整上外边距 */
+            animation: fadeIn 0.5s ease;
+        }
+        .follow-up-questions .question-item {
+            color: var(--primary-color);
+            padding: 8px 12px; /* 调整内边距 */
+            background-color: var(--primary-color-light);
+            border: 1px solid #d0e3ff;
+        }
+        .follow-up-questions .question-item:hover {
+            background-color: #e2eeff;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+        /* --- 消息气泡 --- */
+        .message {
+            display: flex;
+            margin-bottom: 16px;
+            /* 减小最大宽度 */
+            max-width: 80%;
+            animation: fadeInUp 0.5s ease;
+        }
+        .message-container {
+            display: flex;
+            flex-direction: column;
+        }
+        .message-content {
+            padding: 14px 18px;
+            border-radius: 16px;
+            font-size: 15px;
+            line-height: 1.6;
+            word-wrap: break-word;
+            box-shadow: 0 2px 8px var(--shadow-color);
+        }
+        .message-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .message:hover .message-actions {
+            opacity: 1;
+        }
+        .message-actions .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-color-secondary);
+            font-size: 16px;
+            transition: color 0.2s;
+        }
+        .message-actions .action-btn:hover {
+            color: var(--primary-color);
+        }
+        /* 机器人消息 */
+        .bot-message {
+            align-self: flex-start;
+            gap: 12px;
+        }
+        .bot-message .message-container {
+            align-items: flex-start;
+            position: relative;
+        }
+        .bot-message .message-content {
+            background-color: var(--bot-message-bg);
+            border-top-left-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+        .bot-message .avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #6B73FF, #4F5BFF);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            color: white;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        /* 用户消息 */
+        .user-message {
+            align-self: flex-end;
+        }
+        .user-message .message-container {
+            align-items: flex-end;
+        }
+        .user-message .message-content {
+            background-color: var(--user-message-bg);
+            color: #1a2a44;
+            border-top-right-radius: 4px;
+        }
+        /* 重新生成切换功能样式 */
+        .bot-message .message-content-wrapper {
+            position: relative;
+        }
+        .response-version {
+            padding: 14px 18px;
+            border-radius: 16px;
+            font-size: 15px;
+            line-height: 1.6;
+            word-wrap: break-word;
+            box-shadow: 0 2px 8px var(--shadow-color);
+            background-color: var(--bot-message-bg);
+            border-top-left-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+        /* 新的角标样式 */
+        .version-indicator {
+            position: absolute;
+            bottom: -5px;
+            right: 0px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background-color: #fafafa;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 2px 4px var(--shadow-color);
+            transition: transform 0.2s ease, background-color 0.2s;
+        }
+        .version-indicator:hover {
+            transform: translateY(-1px);
+            background-color: #f1f3f5;
+        }
+        .version-indicator .version-nav {
+            font-weight: bold;
+            color: var(--text-color-secondary);
+            font-size: 14px;
+        }
+        .version-indicator .version-nav:hover {
+            color: var(--primary-color);
+        }
+        .version-indicator .version-text {
+            color: var(--text-color-primary);
+            font-weight: 500;
+        }
+        /* --- 输入区 --- */
+        .chat-input-area {
+            border-top: 1px solid var(--border-color);
+            padding: 10px 24px;
+            background-color: var(--widget-bg-color);
+            flex-shrink: 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .input-wrapper {
+            /* 调整为居中对齐，并设置一个固定的最大宽度 */
+            width: 90%; 
+            max-width: 400px;
+            margin: 0 auto;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            background-color: #f5f6f8;
+            border-radius: 24px;
+            padding: 0 16px;
+            gap: 12px;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .input-wrapper:focus-within {
+            border-color: var(--primary-color);
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(74, 137, 232, 0.2);
+        }
+        .input-actions {
+            display: flex;
+        }
+        .input-actions .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+        .input-actions .action-btn:hover {
+            background-color: #e8e9ec;
+        }
+        .input-actions .action-btn svg {
+            width: 24px;
+            height: 24px;
+            color: var(--text-color-secondary);
+            transition: color 0.2s;
+        }
+        .input-actions .action-btn:hover svg {
+            color: var(--primary-color);
+        }
+        .chat-input {
+            flex-grow: 1;
+            border: none;
+            background: transparent;
+            padding: 0;
+            font-size: 15px;
+            color: var(--text-color-primary);
+            resize: none;
+            height: auto;
+            max-height: 120px;
+            line-height: 48px;
+        }
+        .chat-input:focus {
+            outline: none;
+        }
+        .send-button {
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 10px rgba(74, 137, 232, 0.3);
+        }
+        .send-button:hover {
+            transform: scale(1.05);
+            background-color: #3a79d8;
+            box-shadow: 0 6px 14px rgba(74, 137, 232, 0.4);
+        }
+        .send-button svg {
+            color: white;
+            width: 22px;
+            height: 22px;
+        }
+        .disclaimer {
+            font-size: 11px;
+            color: #b0b4b8;
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 0px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-widget">
+        <header class="chat-header">
+            <div class="header-title-container">
+                <div class="header-icon">智</div>
+                <div class="header-title"><h3>智能助手</h3></div>
+            </div>
+            <div class="header-actions">
+                <svg title="全屏" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4 8V4h4V2H2v6h2zm16 0V4h-4V2h6v6h-2zM4 20v-4H2v6h6v-2H4zm16 0v-4h-2v4h-4v2h6v-2z"></path></svg>
+                <svg title="开启新对话" id="new-chat-btn" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>
+                <svg title="关闭" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41z"></path></svg>
+            </div>
+        </header>
+        <div class="chat-body" id="chat-body">
+            <div class="message bot-message" id="initial-welcome">
+                <div class="avatar">智</div>
+                <div class="message-container"><div class="message-content">您好，我是您的人力资源助手，很高兴为您解答人力资源相关问题</div></div>
+            </div>
+            <div class="question-list-container" id="guess-section">
+                <div class="question-list-title">———— 猜你想问 ————</div>
+                <div id="guess-list"></div>
+                <button class="refresh-button" id="refresh-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L20.5 10a5 5 0 0 0-7.85 6.36L10.5 17"/></svg>
+                    <span>换一换</span>
+                </button>
+            </div>
+        </div>
+        <footer class="chat-input-area">
+            <div class="input-wrapper">
+                <div class="input-actions">
+                    <button class="action-btn" title="语音输入" id="voice-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"></path></svg>
+                    </button>
+                    <button class="action-btn" title="上传附件" id="attachment-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"></path></svg>
+                    </button>
+                </div>
+                <textarea id="chat-input" class="chat-input" placeholder="输入您的问题..." rows="1"></textarea>
+                <button class="send-button" id="send-button" title="发送">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12L2.01 3L2 10l15 2l-15 2z"></path></svg>
+                </button>
+            </div>
+            <p class="disclaimer">部分内容由AI大模型智能生成，不代表厂商的观点</p>
+        </footer>
+    </div>
+    <script>
+        let chatBody = document.getElementById('chat-body');
+        let chatInput = document.getElementById('chat-input');
+        let sendButton = document.getElementById('send-button');
+        let guessSection = document.getElementById('guess-section');
+        let guessList = document.getElementById('guess-list');
+        let refreshButton = document.getElementById('refresh-button');
+        let initialWelcome = document.getElementById('initial-welcome');
+        const voiceBtn = document.getElementById('voice-btn');
+        const attachmentBtn = document.getElementById('attachment-btn');
+        const newChatBtn = document.getElementById('new-chat-btn');
+        // 问题库 - 人力资源相关
+        const allQuestions = [
+            '公司的请假制度是怎样的？', '薪酬结构包括哪些部分？', '差旅费报销标准是什么？',
+            '员工晋升制度有哪些要求？', '社会保险缴纳比例是多少？', '加班补贴如何计算？',
+            '新员工入职流程是什么？', '年假天数如何计算？', '绩效考核周期是多久？',
+            '员工培训机会有哪些？', '考勤管理制度具体规定？', '福利制度包含哪些内容？'
+        ];
+        // 模拟回复 - 人力资源相关
+        const botResponses = {
+            "公司的请假制度是怎样的？": "公司请假制度规定：员工请假需提前提交申请，事假需至少提前1个工作日，病假需提供正规医疗机构证明。事假扣除当日工资，病假在医疗期内发放基本工资的80%。年假、婚假、产假等按国家规定执行。",
+            "薪酬结构包括哪些部分？": "公司薪酬结构主要包括：基本工资、绩效奖金、岗位津贴、交通补贴、餐饮补贴、年终奖等。其中基本工资占比60%-70%，绩效奖金根据个人和团队业绩考核发放。",
+            "差旅费报销标准是什么？": "差旅费报销标准如下：一线城市（如北京、上海）住宿标准为400元/天，二线城市300元/天，三线城市200元/天；交通方面，高铁二等座、飞机经济舱可报销，市内交通每日限额80元。",
+            "员工晋升制度有哪些要求？": "员工晋升需满足以下条件：在现岗位工作满1年以上，年度绩效考核等级为优秀或连续两年良好；具备拟晋升岗位所需的专业知识和技能；通过晋升评审小组的面试和评估。",
+            "社会保险缴纳比例是多少？": "公司按照国家规定为员工缴纳五险一金，具体比例为：养老保险单位缴纳16%，个人8%；医疗保险单位缴纳10%，个人2%；失业保险单位缴纳0.5%，个人0.5%；工伤保险单位缴纳0.2%-1.9%（根据行业风险）；生育保险单位缴纳0.8%；住房公积金单位和个人各缴纳12%。",
+            "加班补贴如何计算？": "平日加班按基本工资的150%计算，周末加班按200%计算，法定节假日加班按300%计算。加班需提前申请并经部门主管批准，否则不予计算加班费。",
+            "新员工入职流程是什么？": "新员工入职流程包括：入职前准备（提交入职材料、签署劳动合同）、入职当天（办理入职手续、领取办公用品、录入系统）、入职培训（公司制度、岗位职责、安全培训等）、试用期考核（3个月试用期，期满合格后正式录用）。",
+            "年假天数如何计算？": "员工累计工作已满1年不满10年的，年休假5天；已满10年不满20年的，年休假10天；已满20年的，年休假15天。国家法定休假日、休息日不计入年休假的假期。年假可在当年内一次性或分段使用，需提前申请。",
+            "绩效考核周期是多久？": "公司实行季度考核与年度考核相结合的方式。季度考核主要评估工作任务完成情况，占年度考核权重的60%；年度考核综合评估全年工作表现、能力发展等，占权重的40%。考核结果与绩效奖金、晋升等挂钩。",
+            "员工培训机会有哪些？": "公司为员工提供多样化的培训机会，包括：新员工入职培训、岗位技能培训、管理能力培训、职业发展培训等。此外，公司还支持员工参加外部培训课程、行业研讨会等，并提供一定的培训补贴。",
+            "考勤管理制度具体规定？": "公司实行指纹/人脸识别考勤，工作日上班时间为9:00-18:00，中午休息1小时（12:00-13:00）。迟到/早退30分钟以内扣半天工资，超过30分钟按旷工半天处理。月累计迟到/早退3次以上，取消当月全勤奖。",
+            "福利制度包含哪些内容？": "公司福利制度包含：五险一金、年终奖金、节日福利、生日礼品、带薪年假、员工体检、团建活动、餐饮补贴、交通补贴、通讯补贴、员工培训等。此外，公司还提供下午茶、健身房等福利设施。",
+            "default": "感谢您的提问！关于人力资源的问题，我可以为您解答请假制度、薪酬结构、差旅费报销、晋升制度等方面的内容。请具体说明您想了解的问题，我会为您详细解答。"
+        };
+        // --- 事件监听 ---
+        sendButton.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        // 确保刷新按钮在初始加载时绑定
+        window.addEventListener('load', () => {
+            displayInitialQuestions();
+            refreshButton.addEventListener('click', displayInitialQuestions);
+        });
+        voiceBtn.addEventListener('click', () => alert('语音输入功能待实现'));
+        attachmentBtn.addEventListener('click', () => alert('附件上传功能待实现'));
+        newChatBtn.addEventListener('click', startNewChat);
+        // --- 核心功能 ---
+        function scrollToBottom() {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+        function selectQuestion(questionText) {
+            chatInput.value = questionText;
+            sendMessage();
+        }
+        function sendMessage() {
+            const userText = chatInput.value.trim();
+            if (userText === '') return;
+            removeFollowUpQuestions();
+            if (guessSection.style.display !== 'none') {
+                guessSection.style.display = 'none';
+                initialWelcome.style.display = 'none';
+            }
+            appendMessage('user', userText);
+            chatInput.value = '';
+            autoResize(chatInput);
+            setTimeout(() => {
+                const botResponse = getBotResponse(userText);
+                appendBotMessageWithVersions(botResponse, userText);
+                setTimeout(showFollowUpQuestions, 1500);
+            }, 800);
+        }
+        function getBotResponse(userText) {
+            // 直接匹配原始问题文本
+            let response = botResponses[userText] || botResponses.default;
+            return response;
+        }
+        function appendBotMessageWithVersions(text, originalQuestion = null) {
+            const messageEl = document.createElement('div');
+            messageEl.className = `message bot-message`;
+            messageEl.innerHTML = `
+                <div class="avatar">智</div>
+                <div class="message-container">
+                    <div class="message-content-wrapper">
+                        <div class="response-version" data-version="1">${text}</div>
+                    </div>
+                    <div class="message-actions">
+                        <button class="action-btn" title="赞">👍</button>
+                        <button class="action-btn" title="倒赞">👎</button>
+                        <button class="action-btn regenerate-btn" title="重新生成" ${originalQuestion ? `data-question="${originalQuestion}"` : ''}>🔄</button>
+                    </div>
+                </div>
+            `;
+            chatBody.appendChild(messageEl);
+            
+            const regenerateBtn = messageEl.querySelector('.regenerate-btn');
+            regenerateBtn.addEventListener('click', () => {
+                const q = regenerateBtn.getAttribute('data-question');
+                if (q) {
+                    regenerateResponse(messageEl, q);
+                }
+            });
+            scrollToBottom();
+        }
+        function regenerateResponse(messageEl, originalQuestion) {
+            const responseWrapper = messageEl.querySelector('.message-content-wrapper');
+            const newResponse = getBotResponse(originalQuestion) + ` (新生成)`;
+            const newResponseEl = document.createElement('div');
+            newResponseEl.className = 'response-version';
+            newResponseEl.style.display = 'none'; // 新版本默认隐藏
+            newResponseEl.textContent = newResponse;
+            responseWrapper.appendChild(newResponseEl);
+            
+            const versions = responseWrapper.querySelectorAll('.response-version');
+            versions.forEach(v => v.style.display = 'none');
+            newResponseEl.style.display = 'block';
+            
+            updateVersionIndicator(messageEl, versions.length, versions.length);
+            scrollToBottom();
+        }
+        function updateVersionIndicator(messageEl, currentVersionIndex, totalVersions) {
+            const responseWrapper = messageEl.querySelector('.message-content-wrapper');
+            let indicator = messageEl.querySelector('.version-indicator');
+            
+            if (totalVersions > 1) {
+                if (!indicator) {
+                    indicator = document.createElement('div');
+                    indicator.className = 'version-indicator';
+                    indicator.innerHTML = `
+                        <span class="version-nav prev-version"><</span>
+                        <span class="version-text">1/${totalVersions}</span>
+                        <span class="version-nav next-version">></span>
+                    `;
+                    responseWrapper.appendChild(indicator);
+                }
+                const versionText = indicator.querySelector('.version-text');
+                versionText.textContent = `${currentVersionIndex}/${totalVersions}`;
+                
+                const versions = responseWrapper.querySelectorAll('.response-version');
+                const prevBtn = indicator.querySelector('.prev-version');
+                const nextBtn = indicator.querySelector('.next-version');
+                
+                prevBtn.onclick = () => {
+                    let newIndex = (currentVersionIndex - 2 + totalVersions) % totalVersions;
+                    versions.forEach(v => v.style.display = 'none');
+                    versions[newIndex].style.display = 'block';
+                    updateVersionIndicator(messageEl, newIndex + 1, totalVersions);
+                };
+                nextBtn.onclick = () => {
+                    let newIndex = currentVersionIndex % totalVersions;
+                    versions.forEach(v => v.style.display = 'none');
+                    versions[newIndex].style.display = 'block';
+                    updateVersionIndicator(messageEl, newIndex + 1, totalVersions);
+                };
+            } else if (indicator) {
+                indicator.remove();
+            }
+        }
+        function appendMessage(sender, text) {
+            const messageEl = document.createElement('div');
+            messageEl.className = `message ${sender}-message`;
+            let contentHTML = '';
+            if (sender === 'bot') {
+                contentHTML = `<div class="avatar">智</div><div class="message-container"><div class="message-content">${text}</div></div>`;
+            } else {
+                contentHTML = `<div class="message-container"><div class="message-content">${text}</div></div>`;
+            }
+            messageEl.innerHTML = contentHTML;
+            chatBody.appendChild(messageEl);
+            scrollToBottom();
+        }
+        function displayInitialQuestions() {
+            guessList.innerHTML = '';
+            const shuffled = allQuestions.sort(() => 0.5 - Math.random());
+            const selectedQuestions = shuffled.slice(0, 4);
+            selectedQuestions.forEach(q => {
+                const questionEl = document.createElement('div');
+                questionEl.className = 'question-item';
+                questionEl.onclick = () => selectQuestion(q);
+                questionEl.innerHTML = `<div class="question-item-icon"></div><span>${q}</span>`;
+                guessList.appendChild(questionEl);
+            });
+            // 确保刷新按钮重新绑定事件
+            document.getElementById('refresh-button').addEventListener('click', displayInitialQuestions);
+        }
+        function showFollowUpQuestions() {
+            removeFollowUpQuestions();
+            const followUpContainer = document.createElement('div');
+            followUpContainer.className = 'follow-up-questions question-list-container';
+            followUpContainer.innerHTML = `<div class="question-list-title">您可以继续问我</div>`;
+            const shuffled = allQuestions.sort(() => 0.5 - Math.random());
+            const selectedQuestions = shuffled.slice(0, 3);
+            selectedQuestions.forEach(q => {
+                const questionEl = document.createElement('div');
+                questionEl.className = 'question-item';
+                questionEl.onclick = () => selectQuestion(q);
+                questionEl.innerHTML = `<span>${q}</span>`;
+                followUpContainer.appendChild(questionEl);
+            });
+            chatBody.appendChild(followUpContainer);
+            scrollToBottom();
+        }
+        function removeFollowUpQuestions() {
+            const existingFollowUp = chatBody.querySelector('.follow-up-questions');
+            if (existingFollowUp) existingFollowUp.remove();
+        }
+        function startNewChat() {
+            chatBody.innerHTML = `
+                <div class="message bot-message" id="initial-welcome">
+                    <div class="avatar">智</div>
+                    <div class="message-container"><div class="message-content">您好，我是您的人力资源助手，很高兴为您解答人力资源相关问题</div></div>
+                </div>
+                <div class="question-list-container" id="guess-section">
+                    <div class="question-list-title">———— 猜你想问 ————</div>
+                    <div id="guess-list"></div>
+                    <button class="refresh-button" id="refresh-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L20.5 10a5 5 0 0 0-7.85 6.36L10.5 17"/></svg>
+                        <span>换一换</span>
+                    </button>
+                </div>`;
+            
+            guessSection = document.getElementById('guess-section');
+            guessList = document.getElementById('guess-list');
+            refreshButton = document.getElementById('refresh-button');
+            initialWelcome = document.getElementById('initial-welcome');
+            refreshButton.addEventListener('click', displayInitialQuestions);
+            
+            chatInput.value = '';
+            autoResize(chatInput);
+            displayInitialQuestions();
+            scrollToBottom();
+        }
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        }
+        chatInput.addEventListener('input', () => autoResize(chatInput));
+        
+        window.addEventListener('load', () => {
+            displayInitialQuestions();
+        });
+    </script>
+</body>
+</html>

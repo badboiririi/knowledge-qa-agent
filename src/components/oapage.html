@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OA知识管理页面</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background-image: url("https://objectstorageapi.hzh.sealos.run/vsu1427n-test/test/OA页面2.png");
+            background-size: 100% 100%;
+            background-position: center;
+            background-attachment: fixed;
+            height: 100vh;
+            overflow: hidden; /* 防止页面滚动 */
+        }
+
+        .draggable-widget {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            cursor: move;
+            text-align: center;
+            user-select: none;
+            z-index: 1000;
+            left: auto !important;
+        }
+
+        .draggable-widget .icon-container {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        .draggable-widget .icon-container svg {
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+        
+        .draggable-widget .icon-container:hover svg {
+            transform: scale(1.1);
+        }
+
+        .draggable-widget .label {
+            margin-top: 5px;
+            font-size: 10px;
+            color: #000;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .draggable-widget:hover .label {
+            color: #4A89E8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="draggable-widget" id="draggable-widget">
+        <a href="javascript:void(0)" onclick="openChatWindow()" style="text-decoration: none; color: inherit;">
+            <div class="icon-container">
+                <svg t="1755072262028" class="icon" viewBox="0 0 1123 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7619">
+                    <path d="M346.078968 556.164129c-17.903484 0-29.828129 11.924645-29.828129 29.828129s11.924645 29.828129 29.828129 29.828129 29.828129-11.891613 29.828129-29.828129c0-17.903484-11.924645-29.828129-29.828129-29.828129M781.675355 556.164129c-17.903484 0-29.828129 11.924645-29.828129 29.828129s11.891613 29.828129 29.828129 29.828129c17.903484 0 29.828129-11.891613 29.828129-29.828129 0-17.903484-11.924645-29.828129-29.828129-29.828129" fill="#74ACD6" p-id="7620"></path>
+                    <path d="M996.484129 753.069419v-184.980645c41.752774 11.957677 65.635097 47.731613 65.635097 95.463226 5.945806 41.785806-23.882323 77.592774-65.635097 89.517419z m-214.808774-77.559742c-47.731613 0-89.517419-41.785806-89.51742-89.517419s41.785806-89.517419 89.51742-89.517419 89.517419 41.785806 89.517419 89.517419-41.785806 89.517419-89.517419 89.517419z m-137.249032 149.173678h-161.098323c-17.903484 0-29.828129-11.957677-29.828129-29.828129 0-17.903484 11.891613-29.861161 29.828129-29.861161h161.098323c17.903484 0 29.828129 17.903484 29.828129 29.861161 0 17.870452-11.924645 29.828129-29.828129 29.828129z m-298.347355-149.173678c-47.731613 0-89.517419-41.785806-89.51742-89.517419s41.785806-89.517419 89.51742-89.517419 89.517419 41.785806 89.517419 89.517419-41.785806 89.517419-89.517419 89.517419z m161.098322-554.941935c0-29.828129 23.882323-59.656258 59.689291-59.656258 29.828129 0 59.656258 23.84929 59.656258 59.656258s-23.84929 59.68929-59.656258 59.68929c-35.806968-5.978839-59.68929-29.861161-59.689291-59.68929zM125.324387 753.069419c-35.806968-11.924645-65.668129-47.731613-65.668129-89.517419 0-41.752774 29.861161-77.559742 65.635097-95.463226v184.980645z m871.159742-244.636903v-11.924645c0-101.442065-83.571613-184.980645-184.980645-184.980645h-220.787613V233.934452c47.731613-11.891613 89.517419-59.656258 89.517419-113.36671A119.675871 119.675871 0 0 0 560.887742 1.222194a119.675871 119.675871 0 0 0-119.345548 119.345548c0 53.710452 35.806968 101.442065 89.517419 113.36671v77.592774H316.250839c-101.442065 0-184.980645 83.538581-184.980645 184.980645v11.891613C53.710452 520.390194 0 586.058323 0 663.618065c0 77.559742 53.710452 137.216 125.291355 155.119483a183.758452 183.758452 0 0 0 184.980645 173.056h501.231484c101.409032 0 179.034839-77.592774 184.980645-173.056 71.580903-11.924645 125.291355-77.559742 125.291355-155.119483 5.945806-77.592774-47.731613-143.227871-125.291355-155.152517z" fill="#74ACD6" p-id="7621"></path>
+                </svg>
+            </div>
+            <div class="label">知识问答助手</div>
+        </a>
+    </div>
+
+    <script>
+        function openChatWindow() {
+            // 获取屏幕宽度和高度
+            const screenWidth = window.screen.width;
+            const screenHeight = window.screen.height;
+
+            // 设置弹窗的宽度和高度
+            const popupWidth = 510;
+            const popupHeight = 900;
+            
+            // 计算弹窗左上角的坐标，使其位于屏幕右侧
+            const left = screenWidth - popupWidth - 20; // 距离右侧20px
+            const top = (screenHeight - popupHeight) / 2; // 垂直居中
+
+            const features = `width=${popupWidth},height=${popupHeight},left=${left},top=${top},resizable=yes,scrollbars=yes`;
+            window.open('https://static-host-vsu1427n-test.sealoshzh.site/test/test3.html', '_blank', features);
+        }
+
+        const widget = document.getElementById('draggable-widget');
+        let isDragging = false;
+        let offsetX, offsetY;
+        let scale = 1;
+
+        // 鼠标按下事件
+        widget.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            offsetX = e.clientX - widget.getBoundingClientRect().left;
+            offsetY = e.clientY - widget.getBoundingClientRect().top;
+            widget.style.cursor = 'grabbing';
+        });
+
+        // 鼠标移动事件
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const y = e.clientY - offsetY;
+            widget.style.top = `${y}px`;
+            // 保持元素在右侧，不设置left值
+            widget.style.removeProperty('left');
+        });
+
+        // 鼠标抬起事件
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            widget.style.cursor = 'move';
+        });
+        
+        // 滚轮缩放事件
+        widget.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const scaleAmount = 0.1;
+            if (e.deltaY < 0) {
+                // 放大
+                scale += scaleAmount;
+            } else {
+                // 缩小
+                scale -= scaleAmount;
+            }
+            // 限制缩放范围
+            scale = Math.max(0.5, Math.min(2, scale));
+            widget.style.transform = `scale(${scale})`;
+        });
+    </script>
+
+</body>
+</html>
