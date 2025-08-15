@@ -29,17 +29,13 @@
         ></textarea>
         <div class="input-actions">
           <button class="action-button" title="语音输入">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
-            </svg>
+            <img :src="micIcon" alt="语音输入" />
           </button>
           <button class="action-button" title="上传附件">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-            </svg>
+            <img :src="linkIcon" alt="上传附件" />
           </button>
           <button class="send-button" title="发送" @click="sendMessage">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12L2.01 3L2 10l15 2l-15 2z"></path></svg>
+            <img :src="sendIcon" alt="发送" />
           </button>
         </div>
       </div>
@@ -70,6 +66,9 @@
 
 <script>
 import { ref, onMounted, computed } from 'vue';
+import sendIcon from '../assets/发送.svg';
+import linkIcon from '../assets/链接.svg';
+import micIcon from '../assets/录音.svg';
 import * as docx from 'docx-preview';
 
 export default {
@@ -365,7 +364,10 @@ export default {
       goPrevDiff,
       goNextDiff,
       goPrevPair,
-      goNextPair
+      goNextPair,
+      sendIcon,
+      linkIcon,
+      micIcon
     };
   }
 };
