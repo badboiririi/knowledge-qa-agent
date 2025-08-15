@@ -84,13 +84,13 @@ export default {
 .chat-container {
   display: flex;
   width: 50%;
-  height: 80vh;
-  max-height: 80vh;
+  height: 90vh;
+  max-height: 90vh;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.15);
   overflow: hidden;
   position: fixed;
-  top: 10vh;
+  top: 5vh;
   right: 2%;
   transition: width 0.3s ease;
 }
