@@ -25,7 +25,7 @@
     </header>
 
     <div class="assistant-container">
-      <KnowledgeAssistant v-if="currentAssistant === 'qa'" />
+      <KnowledgeAssistant2 v-if="currentAssistant === 'qa'" />
       <CompareAssistant v-else />
     </div>
   </div>
@@ -33,12 +33,12 @@
 
 <script>
 import { ref } from 'vue';
-import KnowledgeAssistant from './KnowledgeAssistant.vue';
+import KnowledgeAssistant2 from './KnowledgeAssistant2.vue';
 import CompareAssistant from './CompareAssistant.vue';
 
 export default {
   name: 'ChatWindow',
-  components: { KnowledgeAssistant, CompareAssistant },
+  components: { KnowledgeAssistant2, CompareAssistant },
   emits: ['close'],
   setup(props, { emit }) {
     const currentAssistant = ref('qa');
@@ -59,7 +59,7 @@ export default {
 }
 
 .chat-widget {
-  width: 550px;
+  width: 750px;
   height: 900px;
   max-height: calc(100vh - 40px);
   border-radius: 12px;
