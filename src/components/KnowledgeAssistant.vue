@@ -4,7 +4,7 @@
       <div class="message bot-message" id="initial-welcome">
         <div class="avatar">智</div>
         <div class="message-container">
-          <div class="message-content">您好，我是您的人力资源助手，很高兴为您解答人力资源相关问题</div>
+          <div class="message-content">您好，我是您知识问答助手，很高兴为您解答OA知识库相关问题</div>
         </div>
       </div>
 
@@ -34,9 +34,21 @@
           v-model="userInput"
           @keydown="handleKeydown"
         ></textarea>
-        <button class="send-button" title="发送" @click="sendMessage">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12L2.01 3L2 10l15 2l-15 2z"></path></svg>
-        </button>
+        <div class="input-actions">
+          <button class="action-button" title="语音输入">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+            </svg>
+          </button>
+          <button class="action-button" title="上传附件">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+            </svg>
+          </button>
+          <button class="send-button" title="发送" @click="sendMessage">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12L2.01 3L2 10l15 2l-15 2z"></path></svg>
+          </button>
+        </div>
       </div>
       <p class="disclaimer">部分内容由AI大模型智能生成，不代表厂商的观点</p>
     </footer>
@@ -251,10 +263,10 @@ export default {
   box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
 }
 .input-wrapper {
-  width: 90%;
-  max-width: 400px;
+  width: 95%;
+  max-width: 600px;
   margin: 0 auto;
-  height: 48px;
+  min-height: 48px;
   display: flex;
   align-items: center;
   background-color: #f5f6f8;
@@ -283,11 +295,41 @@ export default {
   line-height: 48px;
 }
 .chat-input:focus { outline: none; }
+.input-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-button {
+  background: none;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: var(--text-color-secondary);
+}
+
+.action-button:hover {
+  background-color: rgba(74, 137, 232, 0.1);
+  color: var(--primary-color);
+}
+
+.action-button svg {
+  width: 20px;
+  height: 20px;
+}
+
 .send-button {
   background-color: var(--primary-color);
   border-radius: 50%;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -297,7 +339,7 @@ export default {
   box-shadow: 0 4px 10px rgba(74, 137, 232, 0.3);
 }
 .send-button:hover { transform: scale(1.05); background-color: #3a79d8; box-shadow: 0 6px 14px rgba(74, 137, 232, 0.4); }
-.send-button svg { color: white; width: 22px; height: 22px; }
+.send-button svg { color: white; width: 20px; height: 20px; }
 .disclaimer { font-size: 11px; color: #b0b4b8; text-align: center; margin-top: 10px; }
 
 @keyframes fadeInUp {

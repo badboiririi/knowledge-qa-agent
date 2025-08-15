@@ -1,74 +1,124 @@
 <template>
-  <div class="chat-widget">
-    <header class="chat-header">
-      <div class="header-title-container">
-        <div class="header-icon">智</div>
-        <div class="header-title"><h3>智能助手</h3></div>
-      </div>
-      <div class="header-actions">
-        <div class="assistant-switch">
-          <button
-            class="switch-btn"
-            :class="{ active: currentAssistant === 'qa' }"
-            @click="currentAssistant = 'qa'"
-            title="知识问答助手"
-          >知识问答</button>
-          <button
-            class="switch-btn"
-            :class="{ active: currentAssistant === 'compare' }"
-            @click="currentAssistant = 'compare'"
-            title="制度对比助手"
-          >制度对比</button>
+  <div class="chat-container">
+    <Sidebar
+      v-if="sidebarVisible"
+      :currentAgent="currentAssistant"
+      @switchAgent="switchAgent"
+      @newChat="newChat"
+      @loadHistory="loadHistory"
+      @toggleSidebar="toggleSidebar"
+    />
+    <div class="chat-widget">
+      <header class="chat-header">
+        <div class="header-title-container">
+          <button v-if="!sidebarVisible" class="show-sidebar-btn" @click="toggleSidebar" title="显示侧边栏">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+            </svg>
+          </button>
+          <div class="header-icon">智</div>
+          <div class="header-title"><h3>{{ currentAssistant === 'qa' ? '知识问答助手' : '制度对比助手' }}</h3></div>
         </div>
-        <svg title="关闭" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" @click="closeChat"><path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41z"></path></svg>
-      </div>
-    </header>
+        <div class="header-actions">
+          <svg title="关闭" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" @click="closeChat"><path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41z"></path></svg>
+        </div>
+      </header>
 
-    <div class="assistant-container">
-      <KnowledgeAssistant2 v-if="currentAssistant === 'qa'" />
-      <CompareAssistant v-else />
+      <div class="assistant-container">
+        <KnowledgeAssistant v-if="currentAssistant === 'qa'" />
+        <CompareAssistant v-else />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { ref } from 'vue';
-import KnowledgeAssistant2 from './KnowledgeAssistant2.vue';
+import KnowledgeAssistant from './KnowledgeAssistant.vue';
 import CompareAssistant from './CompareAssistant.vue';
+import Sidebar from './Sidebar.vue';
 
 export default {
   name: 'ChatWindow',
-  components: { KnowledgeAssistant2, CompareAssistant },
+  components: { KnowledgeAssistant, CompareAssistant, Sidebar },
   emits: ['close'],
   setup(props, { emit }) {
     const currentAssistant = ref('qa');
+    const sidebarVisible = ref(true);
+
     const closeChat = () => emit('close');
-    return { currentAssistant, closeChat };
+
+    const switchAgent = (agent) => {
+      currentAssistant.value = agent;
+    };
+
+    const newChat = () => {
+      // 这里可以添加新建对话的逻辑
+      console.log('新建对话');
+    };
+
+    const loadHistory = (index) => {
+      // 这里可以添加加载历史对话的逻辑
+      console.log('加载历史对话', index);
+    };
+
+    const toggleSidebar = () => {
+      // 当侧边栏切换时，直接隐藏/显示整个侧边栏
+      sidebarVisible.value = !sidebarVisible.value;
+    };
+
+    return {
+      currentAssistant,
+      sidebarVisible,
+      closeChat,
+      switchAgent,
+      newChat,
+      loadHistory,
+      toggleSidebar
+    };
   }
 };
 </script>
 
 <style scoped>
+.chat-container {
+  display: flex;
+  width: 50%;
+  height: 80vh;
+  max-height: 80vh;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  overflow: hidden;
+  position: fixed;
+  top: 10vh;
+  right: 2%;
+  transition: width 0.3s ease;
+}
+
+.chat-container.sidebar-hidden {
+}
+
+
+
 .chat-widget {
   --primary-color: #4A89E8;
   --primary-color-light: #e9f2ff;
   --widget-bg-color: #ffffff;
   --text-color-primary: #1a1a1a;
   --text-color-secondary: #5f6368;
-  --border-color: #e0e4e8;
+  --border-color: #e6ebf1;
 }
 
 .chat-widget {
-  width: 750px;
-  height: 900px;
-  max-height: calc(100vh - 40px);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  background-color: var(--widget-bg-color);
+  flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   transition: all 0.2s ease;
+  width: 100%;
+}
+
+.chat-container.sidebar-hidden .chat-widget {
 }
 
 .chat-header {
@@ -107,11 +157,36 @@ export default {
   color: var(--text-color-primary);
 }
 
+.show-sidebar-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+}
+
+.show-sidebar-btn:hover {
+  background-color: #f0f2f5;
+}
+
+.show-sidebar-btn svg {
+  width: 20px;
+  height: 20px;
+  color: var(--text-color-secondary);
+}
+
 .header-actions {
   display: flex;
   align-items: center;
   gap: 10px;
 }
+
+
 
 .header-actions svg {
   width: 22px;
@@ -121,29 +196,6 @@ export default {
   transition: color 0.2s, transform 0.2s;
 }
 
-.assistant-switch {
-  display: inline-flex;
-  background: #f3f5f8;
-  border: 1px solid var(--border-color);
-  border-radius: 999px;
-  padding: 2px;
-}
-
-.switch-btn {
-  border: none;
-  background: transparent;
-  padding: 6px 10px;
-  font-size: 12px;
-  color: var(--text-color-secondary);
-  border-radius: 999px;
-  cursor: pointer;
-}
-
-.switch-btn.active {
-  background: #ffffff;
-  color: var(--text-color-primary);
-  border: 1px solid var(--border-color);
-}
 
 .assistant-container {
   flex: 1;

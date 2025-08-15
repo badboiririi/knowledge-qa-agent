@@ -27,9 +27,21 @@
           v-model="userInput"
           @keydown="handleKeydown"
         ></textarea>
-        <button class="send-button" title="发送" @click="sendMessage">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12L2.01 3L2 10l15 2l-15 2z"></path></svg>
-        </button>
+        <div class="input-actions">
+          <button class="action-button" title="语音输入">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+            </svg>
+          </button>
+          <button class="action-button" title="上传附件">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+            </svg>
+          </button>
+          <button class="send-button" title="发送" @click="sendMessage">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12L2.01 3L2 10l15 2l-15 2z"></path></svg>
+          </button>
+        </div>
       </div>
       <p class="disclaimer">部分内容由AI大模型智能生成，不代表厂商的观点</p>
     </footer>
@@ -360,8 +372,20 @@ export default {
 </script>
 
 <style scoped>
-.assistant-root { display: flex; flex-direction: column; width: 100%; }
-.chat-body { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 10px; gap: 0; }
+.assistant-root {
+  --primary-color: #4A89E8;
+  --primary-color-light: #e9f2ff;
+  --widget-bg-color: #ffffff;
+  --text-color-primary: #1a1a1a;
+  --text-color-secondary: #5f6368;
+  --border-color: #e6ebf1;
+  --bot-message-bg: #f8f9fb;
+  --user-message-bg: #e9f2ff;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.chat-body { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 10px; gap: 0; color: var(--text-color-primary); background-color: #ffffff; }
 :deep(.message) { display: flex; margin-bottom: 16px; max-width: 80%; animation: fadeInUp 0.5s ease; }
 :deep(.message-container) { display: flex; flex-direction: column; }
 :deep(.message-content) { padding: 14px 18px; border-radius: 16px; font-size: 15px; line-height: 1.6; word-wrap: break-word; box-shadow: 0 2px 8px rgba(0,0,0,0.08); color: var(--text-color-primary); }
@@ -377,13 +401,17 @@ export default {
 .question-item:hover { background-color: #f1f3f5; transform: translateY(-1px); border-color: var(--border-color); }
 .question-item-icon { width: 6px; height: 6px; background-color: #ffe5e7; border: 1px solid #e57373; border-radius: 50%; margin-right: 10px; flex-shrink: 0; }
 .chat-input-area { border-top: 1px solid var(--border-color); padding: 10px 24px; background-color: var(--widget-bg-color); flex-shrink: 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); }
-.input-wrapper { width: 90%; max-width: 400px; margin: 0 auto; height: 48px; display: flex; align-items: center; background-color: #f5f6f8; border-radius: 24px; padding: 0 16px; gap: 12px; border: 2px solid transparent; transition: all 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.input-wrapper { width: 95%; max-width: 600px; margin: 0 auto; min-height: 48px; display: flex; align-items: center; background-color: #f5f6f8; border-radius: 24px; padding: 0 16px; gap: 12px; border: 2px solid transparent; transition: all 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 .input-wrapper:focus-within { border-color: var(--primary-color); background-color: #fff; box-shadow: 0 0 0 3px rgba(74,137,232,0.2); }
 .chat-input { flex-grow: 1; border: none; background: transparent; padding: 0; font-size: 15px; color: var(--text-color-primary); resize: none; height: auto; max-height: 120px; line-height: 48px; }
 .chat-input:focus { outline: none; }
-.send-button { background-color: var(--primary-color); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s; box-shadow: 0 4px 10px rgba(74,137,232,0.3); }
+.input-actions { display: flex; align-items: center; gap: 8px; }
+.action-button { background: none; border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background-color 0.2s; color: var(--text-color-secondary); }
+.action-button:hover { background-color: rgba(74, 137, 232, 0.1); color: var(--primary-color); }
+.action-button svg { width: 20px; height: 20px; }
+.send-button { background-color: var(--primary-color); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s; box-shadow: 0 4px 10px rgba(74,137,232,0.3); }
 .send-button:hover { transform: scale(1.05); background-color: #3a79d8; box-shadow: 0 6px 14px rgba(74,137,232,0.4); }
-.send-button svg { color: white; width: 22px; height: 22px; }
+.send-button svg { color: white; width: 20px; height: 20px; }
 .disclaimer { font-size: 11px; color: #b0b4b8; text-align: center; margin-top: 10px; }
 
 /* 弹窗样式 */

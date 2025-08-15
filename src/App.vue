@@ -1,65 +1,18 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref } from 'vue';
 import ChatWindow from './components/ChatWindow.vue';
 
 const showChat = ref(false);
-const isDragging = ref(false);
-const offsetX = ref(0);
-const offsetY = ref(0);
-const scale = ref(1);
-const widgetPosition = ref({ top: 100, right: 20 });
 
 const toggleChat = () => {
+  console.log('toggleChat called, current showChat:', showChat.value);
   showChat.value = !showChat.value;
+  console.log('new showChat value:', showChat.value);
 };
 
 const closeChat = () => {
   showChat.value = false;
 };
-
-const handleMouseDown = (e) => {
-  isDragging.value = true;
-  offsetX.value = e.clientX - e.target.getBoundingClientRect().left;
-  offsetY.value = e.clientY - e.target.getBoundingClientRect().top;
-  e.target.style.cursor = 'grabbing';
-};
-
-const handleMouseMove = (e) => {
-  if (!isDragging.value) return;
-  const y = e.clientY - offsetY.value;
-  widgetPosition.value.top = y;
-  // 保持元素在右侧，不设置left值
-  // widgetPosition.value.left = undefined; // Vue 3 中不需要这样做
-};
-
-const handleMouseUp = (e) => {
-  isDragging.value = false;
-  e.target.style.cursor = 'move';
-};
-
-const handleWheel = (e) => {
-  e.preventDefault();
-  const scaleAmount = 0.1;
-  if (e.deltaY < 0) {
-    // 放大
-    scale.value += scaleAmount;
-  } else {
-    // 缩小
-    scale.value -= scaleAmount;
-  }
-  // 限制缩放范围
-  scale.value = Math.max(0.5, Math.min(2, scale.value));
-};
-
-onMounted(() => {
-  document.addEventListener('mousemove', handleMouseMove);
-  document.addEventListener('mouseup', handleMouseUp);
-});
-
-onBeforeUnmount(() => {
-  document.removeEventListener('mousemove', handleMouseMove);
-  document.removeEventListener('mouseup', handleMouseUp);
-});
 </script>
 
 <template>
@@ -67,14 +20,9 @@ onBeforeUnmount(() => {
     <!-- 背景图 -->
     <div class="background-image"></div>
     
-    <!-- 浮动可拖拽的“知识问答助手”按钮 -->
-    <div 
-      class="draggable-widget" 
-      :style="{ top: widgetPosition.top + 'px', right: widgetPosition.right + 'px', transform: `scale(${scale})` }"
-      @mousedown="handleMouseDown"
-      @wheel="handleWheel"
-    >
-      <a href="javascript:void(0)" @click="toggleChat" style="text-decoration: none; color: inherit;">
+    <!-- 知识问答助手按钮 -->
+    <div class="assistant-widget">
+      <div @click="toggleChat" class="widget-button">
         <div class="icon-container">
           <svg t="1755072262028" class="icon" viewBox="0 0 1123 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7619">
             <path d="M346.078968 556.164129c-17.903484 0-29.828129 11.924645-29.828129 29.828129s11.924645 29.828129 29.828129 29.828129 29.828129-11.891613 29.828129-29.828129c0-17.903484-11.924645-29.828129-29.828129-29.828129M781.675355 556.164129c-17.903484 0-29.828129 11.924645-29.828129 29.828129s11.891613 29.828129 29.828129 29.828129c17.903484 0 29.828129-11.891613 29.828129-29.828129 0-17.903484-11.924645-29.828129-29.828129-29.828129" fill="#74ACD6" p-id="7620"></path>
@@ -82,7 +30,7 @@ onBeforeUnmount(() => {
           </svg>
         </div>
         <div class="label">知识问答助手</div>
-      </a>
+      </div>
     </div>
     
     <!-- 聊天窗口 -->
@@ -112,47 +60,60 @@ onBeforeUnmount(() => {
   background-attachment: fixed;
 }
 
-.draggable-widget {
+.assistant-widget {
   position: fixed;
   top: 100px;
   right: 20px;
-  cursor: move;
-  text-align: center;
-  user-select: none;
   z-index: 1000;
-  left: auto !important;
-  transition: transform 0.3s ease;
 }
 
-.draggable-widget .icon-container {
-  width: 50px;
-  height: 50px;
+.widget-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 12px;
+  color: #1a1a1a;
+  user-select: none;
+  text-align: center;
+}
+
+.widget-button:hover {
+  transform: scale(1.05);
+}
+
+.widget-button .icon-container {
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  margin: 0 auto;
+  flex-shrink: 0;
 }
 
-.draggable-widget .icon-container svg {
+.widget-button .icon-container svg {
   width: 100%;
   height: 100%;
   transition: transform 0.3s ease;
 }
 
-.draggable-widget .icon-container:hover svg {
+.widget-button:hover .icon-container svg {
   transform: scale(1.1);
 }
 
-.draggable-widget .label {
-  margin-top: 5px;
-  font-size: 10px;
-  color: #000;
-  font-weight: bold;
-  transition: color 0.3s ease;
+.widget-button .label {
+  font-weight: 500;
+  white-space: nowrap;
+  font-size: 11px;
+  line-height: 1.2;
 }
 
-.draggable-widget:hover .label {
+.widget-button:hover .label {
   color: #4A89E8;
 }
 
