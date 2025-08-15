@@ -17,7 +17,7 @@
             </svg>
           </button>
           <div class="header-icon">智</div>
-          <div class="header-title"><h3>{{ currentAssistant === 'qa' ? '知识问答助手' : '制度对比助手' }}</h3></div>
+          <div class="header-title"><h3>{{ currentAssistant === 'qa' ? '安东通GPT' : '制度对比助手' }}</h3></div>
         </div>
         <div class="header-actions">
           <svg title="关闭" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" @click="closeChat"><path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41z"></path></svg>

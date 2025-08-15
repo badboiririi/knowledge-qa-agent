@@ -34,16 +34,16 @@
           @click="switchAgent('qa')"
         >
           <div class="agent-icon">智</div>
-          <div class="agent-name">知识问答</div>
+          <div class="agent-name">安东通GPT</div>
         </div>
-        <div
+        <!-- <div
           class="agent-item"
           :class="{ active: currentAgent === 'compare' }"
           @click="switchAgent('compare')"
         >
           <div class="agent-icon">制</div>
           <div class="agent-name">制度对比</div>
-        </div>
+        </div> -->
       </div>
     </div>
 

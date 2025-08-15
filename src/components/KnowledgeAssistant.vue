@@ -4,7 +4,7 @@
       <div class="message bot-message" id="initial-welcome">
         <div class="avatar">智</div>
         <div class="message-container">
-          <div class="message-content">您好，我是您知识问答助手，很高兴为您解答OA知识库相关问题</div>
+          <div class="message-content">您好，我是安东知识大模型小安，关于安东人力资源相关知识，快来问我吧</div>
         </div>
       </div>
 
