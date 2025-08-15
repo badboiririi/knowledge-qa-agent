@@ -82,7 +82,9 @@ export default {
       { title: '公司请假制度咨询', time: '今天 10:23' },
       { title: '薪酬结构问题', time: '昨天 15:47' },
       { title: '安东和斯伦贝谢QHSE原则差异', time: '昨天 09:12' },
-      { title: '差旅费报销标准', time: '3天前' }
+      { title: '差旅费报销标准', time: '3天前' },
+      { title: '员工晋升制度', time: '3天前' },
+      { title: '员工轮岗制度', time: '3天前' }
     ]);
 
     const switchAgent = (agent) => {
