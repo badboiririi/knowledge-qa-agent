@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-container">
+  <div class="chat-container" :class="{ 'maximized': isMaximized }">
     <Sidebar
       v-if="sidebarVisible"
       :currentAgent="currentAssistant"
@@ -20,6 +20,12 @@
           <div class="header-title"><h3>{{ currentAssistant === 'qa' ? '安东通GPT' : '制度对比助手' }}</h3></div>
         </div>
         <div class="header-actions">
+          <svg title="最大化" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" @click="toggleMaximize" v-if="!isMaximized">
+            <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+          </svg>
+          <svg title="还原" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" @click="toggleMaximize" v-else>
+            <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+          </svg>
           <svg title="关闭" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" @click="closeChat"><path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41z"></path></svg>
         </div>
       </header>
@@ -45,6 +51,7 @@ export default {
   setup(props, { emit }) {
     const currentAssistant = ref('qa');
     const sidebarVisible = ref(true);
+    const isMaximized = ref(false);
 
     const closeChat = () => emit('close');
 
@@ -67,14 +74,20 @@ export default {
       sidebarVisible.value = !sidebarVisible.value;
     };
 
+    const toggleMaximize = () => {
+      isMaximized.value = !isMaximized.value;
+    };
+
     return {
       currentAssistant,
       sidebarVisible,
+      isMaximized,
       closeChat,
       switchAgent,
       newChat,
       loadHistory,
-      toggleSidebar
+      toggleSidebar,
+      toggleMaximize
     };
   }
 };
@@ -92,7 +105,16 @@ export default {
   position: fixed;
   top: 5vh;
   right: 2%;
-  transition: width 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.chat-container.maximized {
+  width: 100%;
+  height: 100vh;
+  max-height: 100vh;
+  top: 0;
+  right: 0;
+  border-radius: 0;
 }
 
 .chat-container.sidebar-hidden {
@@ -194,6 +216,11 @@ export default {
   cursor: pointer;
   color: var(--text-color-secondary);
   transition: color 0.2s, transform 0.2s;
+}
+
+.header-actions svg:hover {
+  color: var(--primary-color);
+  transform: scale(1.1);
 }
 
 

@@ -54,7 +54,7 @@ const closeChat = () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("https://objectstorageapi.hzh.sealos.run/vsu1427n-test/test/HR.png");
+  background-image: url("https://objectstorageapi.hzh.sealos.run/vsu1427n-test/test/OA页面2.png");
   background-size: 100% 100%;
   background-position: center;
   background-attachment: fixed;
