@@ -16,8 +16,9 @@
               <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
             </svg>
           </button>
-          <div class="header-icon">智</div>
-          <div class="header-title"><h3>{{ currentAssistant === 'qa' ? '安东通GPT' : '制度对比助手' }}</h3></div>
+          <div class="header-logo">
+            <img src="../assets/GPTicon.png" alt="GPT图标">
+          </div>
         </div>
         <div class="header-actions">
           <svg title="最大化" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" @click="toggleMaximize" v-if="!isMaximized">
@@ -159,24 +160,21 @@ export default {
   gap: 12px;
 }
 
-.header-icon {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #6B73FF, #4F5BFF);
-  border-radius: 50%;
+.header-logo {
+  width: 200px;
+  height: 32px;
+  border-radius: 6px;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: 700;
-  color: white;
-  font-size: 20px;
+  background-color: #f8f9fa;
 }
 
-.header-title h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-color-primary);
+.header-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .show-sidebar-btn {
