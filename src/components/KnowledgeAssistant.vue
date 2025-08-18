@@ -4,7 +4,7 @@
       <div class="message bot-message" id="initial-welcome">
         <div class="avatar">智</div>
         <div class="message-container">
-          <div class="message-content">您好，我是安东知识大模型小安，关于安东人力资源相关知识，快来问我吧</div>
+          <div class="message-content">您好，我是智能知识问答助手，关于OA知识库的各项知识，快来问我吧</div>
         </div>
       </div>
 
@@ -25,7 +25,7 @@
     </div>
 
     <!-- 板块切换区域 -->
-    <div class="category-tabs">
+    <!-- <div class="category-tabs">
       <div 
         class="category-tab" 
         v-for="category in categories" 
@@ -36,7 +36,7 @@
         <img :src="category.icon" :alt="category.name" class="category-icon">
         <span class="category-name">{{ category.name }}</span>
       </div>
-    </div>
+    </div> -->
 
     <footer class="chat-input-area">
       <div class="input-wrapper">
