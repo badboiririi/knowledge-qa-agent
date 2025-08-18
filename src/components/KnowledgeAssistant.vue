@@ -24,6 +24,20 @@
       </div>
     </div>
 
+    <!-- 板块切换区域 -->
+    <div class="category-tabs">
+      <div 
+        class="category-tab" 
+        v-for="category in categories" 
+        :key="category.id"
+        :class="{ active: currentCategory === category.id }"
+        @click="switchCategory(category.id)"
+      >
+        <img :src="category.icon" :alt="category.name" class="category-icon">
+        <span class="category-name">{{ category.name }}</span>
+      </div>
+    </div>
+
     <footer class="chat-input-area">
       <div class="input-wrapper">
         <textarea
@@ -72,6 +86,16 @@ import { ref, onMounted, computed } from 'vue';
 import sendIcon from '../assets/发送.svg';
 import linkIcon from '../assets/链接.svg';
 import micIcon from '../assets/录音.svg';
+import techIcon from '../assets/技术.svg';
+import qhseIcon from '../assets/qhse.svg';
+import businessIcon from '../assets/经营.svg';
+import hrIcon from '../assets/ic_hr.svg';
+import financeIcon from '../assets/财务.svg';
+import fundIcon from '../assets/资金.svg';
+import digitalIcon from '../assets/AI.svg';
+import legalIcon from '../assets/法务.svg';
+import auditIcon from '../assets/监察.svg';
+import supplyIcon from '../assets/供应链.svg';
 import * as docx from 'docx-preview';
 
 export default {
@@ -82,6 +106,27 @@ export default {
     const modal = ref(null);
     const userInput = ref('');
     const showGuess = ref(true);
+    
+    // 板块切换相关
+    const currentCategory = ref('tech');
+    const categories = ref([
+      { id: 'tech', name: '技术管理', icon: techIcon },
+      { id: 'qhse', name: 'QHSE', icon: qhseIcon },
+      { id: 'business', name: '计划经营', icon: businessIcon },
+      { id: 'hr', name: '人力资源', icon: hrIcon },
+      { id: 'finance', name: '财务管理', icon: financeIcon },
+      { id: 'fund', name: '资金管理', icon: fundIcon },
+      { id: 'digital', name: '数智技术', icon: digitalIcon },
+      { id: 'legal', name: '法务管理', icon: legalIcon },
+      { id: 'audit', name: '审计监察', icon: auditIcon },
+      { id: 'supply', name: '供应链', icon: supplyIcon }
+    ]);
+    
+    const switchCategory = (categoryId) => {
+      currentCategory.value = categoryId;
+      // 这里可以添加切换板块时的逻辑，比如更新问题列表等
+      console.log('切换到板块:', categoryId);
+    };
 
     const initialQuestions = [
       '公司的请假制度是怎样的？',
@@ -399,6 +444,9 @@ export default {
       chatInput,
       userInput,
       showGuess,
+      currentCategory,
+      categories,
+      switchCategory,
       initialQuestions,
       sendMessage,
       handleKeydown,
@@ -649,6 +697,130 @@ export default {
 .send-button:hover { transform: scale(1.05); background-color: #3a79d8; box-shadow: 0 6px 14px rgba(74, 137, 232, 0.4); }
 .send-button svg { color: white; width: 20px; height: 20px; }
 .disclaimer { font-size: 11px; color: #b0b4b8; text-align: center; margin-top: 10px; }
+
+/* 板块切换样式 */
+.category-tabs {
+  display: flex;
+  justify-content: center;
+  padding: 5px 12px;
+  background-color: #ffffff;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+/* 自定义滚动条样式 */
+.category-tabs::-webkit-scrollbar {
+  height: 4px;
+}
+
+.category-tabs::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+}
+
+.category-tabs::-webkit-scrollbar-thumb {
+  background: #d0d0d0;
+  border-radius: 2px;
+}
+
+.category-tabs::-webkit-scrollbar-thumb:hover {
+  background: #b8b8b8;
+}
+
+.category-tab {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #f8f9fb;
+  border: 1px solid transparent;
+  min-width: 50px;
+  flex-shrink: 0;
+  color: #77637b;
+}
+
+.category-tab:hover {
+  background-color: #e9f2ff;
+  border-color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+.category-tab.active {
+  background-color: var(--primary-color-light);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.category-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+  object-fit: contain;
+}
+
+.category-name {
+  font-size: 11px;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  .category-tabs {
+    padding: 4px;
+    gap: 2px;
+    justify-content: flex-start;
+    max-width: 100%;
+  }
+  
+  .category-tab {
+    padding: 2px 4px;
+    min-width: 35px;
+  }
+  
+  .category-icon {
+    width: 14px;
+    height: 14px;
+    margin-right: 2px;
+  }
+  
+  .category-name {
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-tabs {
+    padding: 3px;
+    gap: 1px;
+    justify-content: flex-start;
+    max-width: 100%;
+  }
+  
+  .category-tab {
+    padding: 2px 3px;
+    min-width: 30px;
+  }
+  
+  .category-icon {
+    width: 12px;
+    height: 12px;
+    margin-right: 1px;
+  }
+  
+  .category-name {
+    font-size: 7px;
+  }
+}
 
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(12px); }
