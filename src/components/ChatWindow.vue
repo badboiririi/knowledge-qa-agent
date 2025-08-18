@@ -145,6 +145,7 @@ export default {
 }
 
 .chat-header {
+  height: 37px;
   padding: 16px 24px;
   background-color: var(--widget-bg-color);
   border-bottom: 1px solid var(--border-color);
